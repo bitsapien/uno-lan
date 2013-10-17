@@ -1,0 +1,4 @@
+Oct 14 ,2013
+============
+
+ * players appearing on table even when they have gone offline

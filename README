@@ -1,0 +1,122 @@
+UNO game that can run on a network , developed as a web-app using technologies like PHP and Ajax.
+
+ DOCUMENTATION : 
+
+  A little bit of nomenclature :
+  ------------------------------
+   * User = A client who visits the page without registering as a player.
+   * Player = A client who has registered as a player and is available on the table:uno_players
+   * Mate = A client who was a player ,and has now joined a table to play.
+   * Project = Refers to the app on a whole.
+   * Game Session = Refers to a Table and the vice-versa.
+
+  Licsence : GPLv2
+
+	===========================================================================================
+
+	index.php
+	---------
+	 * The default page for the project. It takes input ,the name of the player ,and sends it to 
+	   (core/create/add_player.php). 
+	 * It displays a message ,if a player with the same name exists ,this it does after a GET 
+	   request feedback is received from (core/create/add_player.php)
+
+	===========================================================================================
+
+	core/db/SQLconnection.php
+	-------------------------
+	 * Connection to the SQL server is made here ,and any changes to the connection 
+	   configuration has to be made here.
+
+	===========================================================================================
+
+	core/db/SQL.php
+	---------------
+	 * The file includes the SQL configuration for access by all parts of the project.
+	 * Future updates will contain project-specific SQL-modules
+
+	===========================================================================================
+
+	core/create/add_player.php
+	--------------------------
+	 * Removes any old players ,who last visited the project and have now drifted away.
+	 * Checks for a player with same name exists ? And if yes,skips adding player ,sends a
+	   feedback to (index.php)
+	 * Adds player to table:uno_players
+	 * Sets the SESSION['p_id'] and $_SESSION['p_name']
+	 * Redirects to (lobby.php)
+
+	===========================================================================================
+
+	lobby.php
+	---------
+	 * Updates players about which players are online(core/ajax/player.php) ,and showing which 
+	   game sessions that are available with the players who have joined it with a link to it.
+	   (core/ajax/game_sessions.php)
+	 * Link to create a session. (core/create/add_game_session.php)
+
+	===========================================================================================
+
+	core/create/add_game_session.php
+	--------------------------------
+	 * Add table_id,table_top_card to table:uno_tables
+	 * Add activity log -> 'has started a game session(table).'
+	 * Redirect to (lobby.php)
+
+	===========================================================================================
+
+	core/ajax/game_sessions.php
+	--------------------------------
+	 * Extracts list of online game_sessions.
+	 * Generate list of players in a current game_session.
+	 * Checks whether session has started ,a displays a message accordingly.
+
+	===========================================================================================
+
+	core/ajax/players.php
+	--------------------------------
+	 * Updates the player_presence column and player_online column to update online-status.
+	 * Extracts list of online users.
+	 * Sets player_online=0 if offline for more than 10s.
+	 * Delets player from table:uno_players if inactive for more than 3 minutes.
+
+	===========================================================================================
+
+	core/create/join.php
+	--------------------------------
+	 * Gets the respective game_session ID
+	 * Binds the player to the selected game_session
+	 * Updates activity log -> ' has joined this table.'
+	 * Sets the SESSION['table_id']
+	 * Redirects to (table.php)
+
+	===========================================================================================
+
+	table.php
+	---------
+	 * Updates mates about which mates are online(core/ajax/mates.php)
+	 * Keeps the sessions and players alive (core/ajax/player.php),(core/ajax/game_sessions.php)
+	 * Displays a waiting message if players less than 3 ,and when there are more than 3 ,a 
+	   countdown of 30 seconds is shown ,after which it redirects to (core/create/start_game.php)
+	   (core/ajax/mates.php)
+
+	===========================================================================================
+
+	core/destroy/leave.php
+	--------------------------------
+	 * Unbinds the player to the selected game_session
+	 * Unsets the SESSION['table_id']
+	 * Updates activity log -> ' has joined this table.'
+	 * Redirects to (lobby.php)
+
+	===========================================================================================
+
+	core/ajax/mates.php
+	--------------------------------
+	 * Updates the mates list of the table.
+	 * Checks for 3 mates available ,if no ,sets column table_created to ''
+	 * If 3 or more mates are available ,sets the table_created column to 30 seconds from then.
+	 * Displays the countdown ,and when countdown gets over ,redirects to 
+	  (core/create/start_game.php)
+
+
